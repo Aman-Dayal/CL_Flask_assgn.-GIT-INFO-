@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Github</title>
+    
+    <link rel="stylesheet" type="text/css" href="./static/style1.css">
+    
+    
+</head>
+<style>
+  form {
+      background-color: #f2f2f258; /* Set background color */
+      padding: 10px; /* Add padding to the form */
+      border-radius: 10px; /* Add rounded corners to the form */
+   }
+
+</style>
+<body style="background-image:url(https://gitprotect.io/blog/wp-content/uploads/2022/03/GitHub-secure.png);">
+  <div>
+    <form action="#">
+      
+        <label id="test"><b>Enter github profile to get user info:</b></label>
+        <input type="text" Id="prof">
+        <button id="submit" onclick='git_prof()'>Search</button>
+        
+      <hr>
+      
+      
+      
+      
+    </form>
+    
+    
+    
+  </div>
+
+
+  <div class="tables_container">
+    <table id="userTable"></table>
+    
+    <table id="repoTable"></table>
+  </div>
+
+
+  <!-- <p id="demo" style="margin-top :100px" ></p> -->
+  
+  
+    
+      
+    <script>
+
+function Alert(){
+  if (document.getElementById('prof').value ==""){
+    alert("Please Enter a Username")
+  return;
+}
+  return;
+}
+
+
+
+
+function handleResponse(response,table1) {
+  var caption = document.createElement("caption");
+  if (table1 ==="repoTable"){
+      // for (var i in response){
+      // Get the table element
+    var repo_table = document.getElementById("repoTable");
+      
+    repo_table.innerHTML = "";  
+    
+    caption.innerHTML = "REPOSITORIES INFORMATION";
+
+    repo_table.appendChild(caption);
+
+    
+    
+    for (let i = 0; i < response.length; i++) {  
+
+          var repo_numCell = repo_table.insertRow()
+
+          
+          var repo_keyCell = repo_numCell.insertCell();
+          repo_keyCell.innerHTML = "repo:";
+
+          var repo_valueCell = repo_numCell.insertCell();
+          repo_valueCell.innerHTML = i+1;
+
+
+          let requiredFields = ["name", "description", "created_at", "updated_at","language","size"];
+         
+          let requiredData = {};
+          for (let j = 0; j < requiredFields.length; j++) {
+          if (response[i].hasOwnProperty(requiredFields[j])) {
+          requiredData[requiredFields[j]] = response[i][requiredFields[j]];
+          } 
+          
+          
+          var row = repo_table.insertRow()
+          var keyCell = row.insertCell();
+          keyCell.innerHTML = requiredFields[j];
+          var valueCell = row.insertCell();
+          valueCell.innerHTML = requiredData[requiredFields[j]];
+        }
+        
+      } 
+      
+    }
+  
+    
+
+  else if (table1==="userTable"){
+    var user_table = document.getElementById("userTable");
+    // clearTables();
+    
+    user_table.innerHTML = "";
+
+    caption.innerHTML = "USER DETAILS";
+
+    user_table.appendChild(caption);
+
+
+    for (var key in response) {
+      if (response[key] !=""){
+        var row = user_table.insertRow();
+        var keyCell = row.insertCell();
+        keyCell.innerHTML = key;
+        var valueCell = row.insertCell();
+        valueCell.innerHTML = response[key];
+
+      }
+      
+    }
+  } 
+
+  
+
+
+
+}    
+
+function git_prof(){
+    Alert();
+    var x = document.getElementById("prof").value;
+    // let repo_url = "http://127.0.0.1:5000/user_repo"
+    // let user_url = "http://127.0.0.1:5000/gt_user"
+    
+
+    fetch("http://127.0.0.1:5000/gt_user",
+    {
+      method:'POST',
+      headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ prof: x })
+  })
+    .then(response => response.json())
+    .then(userData => {
+      console.log(userData)
+      handleResponse(userData, "userTable");
+    });
+
+    // var url1 = "";
+    // var Val = { "prof": "login" };
+    // Val["prof"] = x;
+    fetch("http://127.0.0.1:5000/user_repo", {
+      method: 'POST',
+      headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ prof: x })
+  })
+    .then(response => response.json())
+    // .then (data=>console.log(data))
+    .then(repoData => handleResponse(repoData, "repoTable"));
+    // .then();
+    
+}
+
+// searchbtn = document.getElementById('submit')
+// tblcon = document.getElementById('tables_container');
+// tblcon.innerHTML = '';
+
+// searchbtn.addEventListener('click',function(){
+  
+// }
+// );
+
+
+// }
+
+  // var repo_table = document.getElementById("repoTable");
+  // while(repo_table.rows.length > 0)
+  // {
+  //   repo_table.deleteRow(0);
+  // }
+  // });
+
+// function git_repo(){
+
+// }
+
+    </script>   
+    
+</body>
+</html>
